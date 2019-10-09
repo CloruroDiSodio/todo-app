@@ -1,9 +1,11 @@
 import React from 'react';
-import { StyleSheet, View, Switch , Alert, SafeAreaView } from 'react-native';
-import { Container, Header, Title, Content, Footer, FooterTab, Button, Left, Right, Body, Icon, Text, Card, CardItem} from 'native-base';
+import { StyleSheet} from 'react-native';
+import { Container, Header, Title, Content, Footer, FooterTab, Button, Left, Right, Body, Icon, Text, Item, Input, Form, Label} from 'native-base';
 import * as Font from 'expo-font';
 import { Ionicons } from '@expo/vector-icons';
 import { AppLoading } from 'expo';
+import SingleTodo from "./components/SingleTodo";
+import arrayMove from "array-move";
 
 
 export default class App extends React.Component {
@@ -11,8 +13,12 @@ export default class App extends React.Component {
     super(props);
     this.state = {
       isReady: false,
-      isChecked: false
+      currentTodo:'',
+      todos: ["Tagliare l'erba", "Andare in palestra", "Studiare", "Fare la spesa"]
     };
+
+    this.moveToBottom = this.moveToBottom.bind(this)
+
   }
 
   async componentDidMount() {
@@ -24,45 +30,59 @@ export default class App extends React.Component {
     this.setState({isReady: true});
   }
 
+  moveToBottom(array, i){
+    let newTodos = arrayMove(array, i, array.length)
+    this.setState({todos: newTodos})
+  }
+
   render() {
     if (!this.state.isReady) {
       return <AppLoading/>;
     }
 
+
     return (
       <Container>
-        <Header>
+        <Header style={[styles.header]}>
           <Left>
             <Button transparent>
               <Icon name='menu'/>
             </Button>
           </Left>
           <Body>
-            <Title>Header</Title>
+            <Title>Todo App</Title>
           </Body>
           <Right/>
         </Header>
-        <Content>
-
-            <Card>
-              <CardItem>
-                <Body style={[styles.bodyCard]}>
-                  <Text>
-                    To do
-                  </Text>
-                  <Button rounded dark bordered style={[(!this.state.isChecked)?  styles.emptyButton : '']}>
-                    {this.state.isChecked && <Icon name='checkmark' />}
-                  </Button>
-                </Body>
-              </CardItem>
-            </Card>
+        <Content style={[styles.body]}>
+          {this.state.todos.map((todo, i) =>
+              <SingleTodo todo={todo} i={i} stylesBodyCard={styles.bodyCard} moveToBottom={this.moveToBottom} todos={this.state.todos}/>
+          )}
         </Content>
-        <Footer>
-          <FooterTab>
-            <Button full>
-              <Text>Footer</Text>
-            </Button>
+        <Footer style={[styles.footer]}>
+          <Form >
+          <FooterTab regular>
+            <Item>
+              <Input
+                placeholder="Write Your Todo"
+                onChange={(e) => this.setState({currentTodo: e.target.value})}
+                value={this.state.currentTodo}
+                style={[styles.todo]}
+              />
+            </Item>
+              <Button
+                onPress={()=> {
+                  if(this.state.currentTodo) {
+                    let newTodos = [...this.state.todos, this.state.currentTodo]
+                    this.setState({todos: newTodos})
+                    this.setState({currentTodo: ''})
+                  }
+                }}
+              >
+                <Text><Icon name="add-circle" style={{color: '#fff'}}/></Text>
+              </Button>
           </FooterTab>
+          </Form>
         </Footer>
       </Container>
 
@@ -73,16 +93,27 @@ export default class App extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
+    flexDirection: ''
   },
-  todoBox : {
-    borderColor: '#c9c9c9',
-    borderWidth: 1,
-    borderStyle: 'solid',
-    padding: 10,
+  header: {
+    backgroundColor: "black"
 
+  } ,
+
+  footer : {
+    backgroundColor: '#5cb85c',
+  },
+
+  body: {
+    padding: 10
+
+  },
+
+  mark: {
+    marginRight:0,
+    marginLeft:0
   },
 
   bodyCard : {
@@ -94,6 +125,16 @@ const styles = StyleSheet.create({
   },
   emptyButton: {
     width: '30px',
-   // height: '30px'
-  }
+   height: '30px',
+    padding: 5
+  },
+  checkedText: {
+    textDecorationLine: 'line-through'
+
+  },
+  todo:{
+    color: '#fff',
+    borderWidth: '0px 0px 0px'
+
+}
 });
