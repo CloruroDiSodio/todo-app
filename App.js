@@ -1,8 +1,9 @@
 import React from 'react';
 import { StyleSheet, View, Switch , Alert, SafeAreaView } from 'react-native';
-import { Container, Header, Title, Content, Footer, FooterTab, Button, Left, Right, Body, Icon, Text } from 'native-base';
+import { Container, Header, Title, Content, Footer, FooterTab, Button, Left, Right, Body, Icon, Text, Card, CardItem} from 'native-base';
 import * as Font from 'expo-font';
 import { Ionicons } from '@expo/vector-icons';
+import { AppLoading } from 'expo';
 
 
 export default class App extends React.Component {
@@ -10,6 +11,7 @@ export default class App extends React.Component {
     super(props);
     this.state = {
       isReady: false,
+      isChecked: false
     };
   }
 
@@ -41,17 +43,19 @@ export default class App extends React.Component {
           <Right/>
         </Header>
         <Content>
-          <Text>
+
             <Card>
               <CardItem>
-                <Body>
+                <Body style={[styles.bodyCard]}>
                   <Text>
                     To do
                   </Text>
+                  <Button rounded dark bordered style={[(!this.state.isChecked)?  styles.emptyButton : '']}>
+                    {this.state.isChecked && <Icon name='checkmark' />}
+                  </Button>
                 </Body>
               </CardItem>
             </Card>
-          </Text>
         </Content>
         <Footer>
           <FooterTab>
@@ -79,5 +83,17 @@ const styles = StyleSheet.create({
     borderStyle: 'solid',
     padding: 10,
 
+  },
+
+  bodyCard : {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    flexDirection: 'row'
+
+  },
+  emptyButton: {
+    width: '30px',
+   // height: '30px'
   }
 });
